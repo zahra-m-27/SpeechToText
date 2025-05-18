@@ -1,0 +1,24 @@
+.title {
+  display: block;
+  height: 48px;
+  font-family: "Vazirmatn";
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 100%;
+  text-align: center;
+  color: #00ba9f;
+}
+
+.description {
+  font-family: "Vazirmatn";
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+  text-align: center;
+  color: #969696;
+}
+
+.text {
+  position: absolute;
+  top: 12%;
+}

@@ -1,0 +1,28 @@
+.link {
+  border: 1px solid #ff1654;
+  width: fit-content;
+  height: 46px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  border-radius: 50px;
+  background-color: transparent;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 81px 7px 18px;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  background-color: #ff1654;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon img {
+  width: 16px;
+  height: 14px;
+}

@@ -1,0 +1,15 @@
+.container {
+  direction: rtl;
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  position: relative;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  width: 88%;
+  align-items: center;
+  position: relative;
+}

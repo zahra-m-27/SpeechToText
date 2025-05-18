@@ -1,0 +1,79 @@
+.main {
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 13px;
+  align-self: flex-end;
+  margin-top: 14px;
+}
+
+.main span {
+  /* font-family: "Vazirmatn"; */
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 100%;
+  text-align: right;
+  color: #626262;
+}
+
+.dropDownContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.dropDownHeader {
+  border: 1px solid #00ba9f;
+  border-radius: 30px;
+  box-shadow: 1px 1px 50px rgba(99, 99, 99, 0.05);
+  background-color: transparent;
+  padding: 6px 0;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  width: 105px;
+}
+
+.dropDownHeader img {
+  width: 9px;
+  height: 6px;
+  position: absolute;
+  left: 15px;
+}
+
+.dropDownHeader span {
+  /* font-family: "Vazirmatn"; */
+  font-weight: 400;
+  font-size: 14px;
+  color: #00ba9f;
+  margin-right: 23px;
+}
+
+.dropDownList {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 50px;
+  background: white;
+  border: 1px solid #00ba9f;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: calc(100% - 10px);
+  z-index: 1;
+}
+
+.dropDownList div {
+  padding: 8px 12px;
+  cursor: pointer;
+  /* font-family: "Vazirmatn"; */
+  font-weight: 400;
+  font-size: 14px;
+  color: #626262;
+}
+
+.dropDownList div:hover {
+  background-color: #eceaea;
+  border-radius: 10px;
+}

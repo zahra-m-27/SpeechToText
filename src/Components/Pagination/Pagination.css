@@ -1,0 +1,51 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 260px;
+  transition: min-width 0.3s ease;
+  padding: 0;
+}
+
+.pagination button {
+  padding: 0;
+  text-align: center;
+  border: none;
+  background-color: transparent;
+  color: #000000;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  font-family: "Vazirmatn";
+  font-weight: 300;
+  font-size: 14px;
+}
+
+.pagination button.active {
+  background-color: #07b49b;
+  color: white;
+  font-weight: 400;
+}
+
+.pagination button:disabled {
+  background-color: transparent;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.pagination .dots {
+  padding: 0;
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  color: #000000;
+  font-family: "Vazirmatn";
+  font-weight: 300;
+  font-size: 12px;
+  text-align: center;
+}

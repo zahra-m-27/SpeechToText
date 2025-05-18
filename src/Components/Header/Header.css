@@ -1,0 +1,77 @@
+.container {
+  margin: 48px 0 0 48px;
+  align-self: flex-end;
+}
+
+.menuBox {
+  border: 2px solid #00ba9f;
+  border-radius: 20px;
+  width: 70%;
+  padding: 9px 21px 9px 15px;
+  cursor: pointer;
+  font-family: "Vazirmatn";
+  font-weight: 400;
+  font-size: 15px;
+  color: #00ba9f;
+  position: relative;
+  height: 26%;
+}
+
+.exitIcon {
+  width: 12px;
+  height: 13px;
+  margin-left: 10px;
+}
+
+.userIcon {
+  width: 18.5px;
+  height: 18.5px;
+  margin-left: 5px;
+}
+
+.dropIcon {
+  width: 9.8px;
+  height: 6.5px;
+}
+
+.menuContent {
+  height: 40px;
+  position: relative;
+}
+
+.exit,
+.separator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.exit {
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.separator {
+  border-top: 1px solid #00bfa5;
+  top: 0;
+  margin: 11px auto;
+  width: 92%;
+}
+
+.guest {
+  display: flex;
+  align-items: center;
+}
+
+.guest span {
+  margin-left: 11px;
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+}

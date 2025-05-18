@@ -1,0 +1,31 @@
+.main {
+  background-image: url("../Assets/images/Alefba.png"),
+    linear-gradient(to bottom, #00b5a0, #00c69b);
+  display: flex;
+  flex-direction: column;
+  width: 12%;
+  height: 100%;
+  border-radius: 10px 0 0 10px;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: "Vazirmatn", sans-serif;
+  line-height: 35px;
+  margin: 6vh auto 0;
+  padding-bottom: 20%;
+}
+
+.title img {
+  width: 19px;
+  height: 38px;
+}
+
+.options {
+  margin-top: 20vh;
+}

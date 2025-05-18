@@ -1,0 +1,166 @@
+.archive-container {
+  width: 81%;
+  position: absolute;
+  top: 7%;
+}
+
+.pageTitle {
+  font-weight: 400;
+  font-size: 24px;
+  text-align: right;
+  color: #00ba9f;
+}
+
+.archive-header {
+  font-weight: 400;
+  font-size: 14px;
+  margin-bottom: 9px;
+}
+
+.archive-row-wrapper {
+  transition: box-shadow 0.3s ease;
+  border-radius: 10px;
+}
+
+.expanded {
+  box-shadow: 1px 1px 8px #0000001a;
+  border: 1px solid #00ba9f;
+}
+
+.archive-header,
+.archive-row {
+  display: grid;
+  grid-template-columns: 80px 500px 1fr 1fr 1fr 170px;
+  align-items: center;
+  padding: 13px 0;
+  font-size: 0.75rem;
+  font-weight: 300;
+}
+
+.upload-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 40px;
+  margin-right: 9px;
+}
+
+.title {
+  font-size: 1rem;
+  cursor: pointer;
+  direction: ltr;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 47px;
+}
+
+.link {
+  color: #118ad3;
+}
+
+.date {
+  text-align: center;
+  transform: translateX(25%);
+}
+
+.type {
+  direction: ltr;
+  text-align: center;
+  transform: translateX(32%);
+}
+
+.duration {
+  text-align: center;
+  transform: translateX(32%);
+}
+
+.icons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 19px;
+}
+
+.icons div {
+  cursor: pointer;
+  border-radius: 50%;
+  background-color: transparent;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.downloadIcon {
+  position: relative;
+}
+
+.downloadIcon:hover .tooltip {
+  opacity: 1;
+}
+
+.downloadIcon img {
+  width: 13px;
+  height: 14px;
+}
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  color: #000000b2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 300;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+  pointer-events: none;
+  text-align: right;
+}
+
+.wordIcon {
+  width: 13px;
+  height: 16px;
+}
+
+.copyIcon {
+  width: 17px;
+  height: 17px;
+}
+
+.deleteIcon img {
+  width: 10px;
+  height: 15px;
+}
+
+.deleteIcon:hover {
+  background-color: #dc3545;
+}
+
+.archive-details {
+  animation: fadeIn 0.3s ease-in-out;
+  width: 98%;
+  margin-right: 80px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}

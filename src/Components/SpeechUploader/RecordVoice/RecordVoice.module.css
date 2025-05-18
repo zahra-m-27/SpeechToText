@@ -1,0 +1,12 @@
+.mic {
+  background-color: #00b3a1;
+  border-radius: 50%;
+  border: 1px solid #00b3a1;
+  width: 62px;
+  height: 62px;
+  cursor: pointer;
+}
+.mic img {
+  width: 19.6px;
+  height: 32.7px;
+}
