@@ -6,11 +6,13 @@ import TimeIcon from "../../Assets/images/timeIcon.png";
 import styles from "./ShowAudioDetails.module.css";
 import { useRef, useState } from "react";
 import AudioPlayer from "./AudioPlayer/AudioPlayer";
+import { useSelector } from "react-redux";
 
 export default function ShowAudioDetails({ iconsStyle, separatorStyle }) {
   const [activeTab, setActiveTab] = useState("simple");
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef(null);
+  const language = useSelector((state) => state.language.value);
 
   const transcriptData = [
     { start: "0", end: "3", label: "[با]" },
@@ -69,7 +71,13 @@ export default function ShowAudioDetails({ iconsStyle, separatorStyle }) {
       {activeTab == "simple" ? (
         <div className={styles.test}>
           <div className={styles.textContainer}>
-            <p>
+            <p
+              style={
+                language == "english"
+                  ? { textAlign: "left" }
+                  : { textAlign: "right" }
+              }
+            >
               [با][---][---] [با] و[---][---] [با][---][---][---][---] کجایی تو
               [خوش] می دیدی من خسته شدم [ما را] [به] این [زودی] چه جوری شد [عشق
               شدی] به این است[---] [آخرش] سی با فکر [و] چقدر [نزار می خوام] که
