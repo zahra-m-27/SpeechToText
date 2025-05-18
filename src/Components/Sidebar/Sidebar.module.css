@@ -19,6 +19,7 @@
   line-height: 35px;
   margin: 6vh auto 0;
   padding-bottom: 20%;
+  cursor: pointer;
 }
 
 .title img {
