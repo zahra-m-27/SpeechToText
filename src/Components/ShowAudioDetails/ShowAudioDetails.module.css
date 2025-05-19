@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
+  margin-top: 35px;
   width: 91%;
   height: 100%;
   position: relative;
@@ -15,7 +15,6 @@
 }
 
 .header span {
-  /* font-family: "Vazirmatn"; */
   font-weight: 400;
   font-size: 14px;
   display: flex;
@@ -67,7 +66,7 @@
   background-color: #118ad3;
   border: 1px solid #118ad3;
   border-radius: 20px;
-  /* font-family: "Vazirmatn"; */
+  font-family: "Vazirmatn";
   font-weight: 400;
   font-size: 14px;
   color: #ffffff;
@@ -75,6 +74,7 @@
   align-items: center;
   gap: 7px;
   padding: 5px 11px;
+  cursor: pointer;
 }
 
 .restart {
