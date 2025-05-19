@@ -1,5 +1,5 @@
 .main {
-  background-image: url("../Assets/images/Alefba.png"),
+  background-image: url("../../Assets/images/Alefba.png"),
     linear-gradient(to bottom, #00b5a0, #00c69b);
   display: flex;
   flex-direction: column;
