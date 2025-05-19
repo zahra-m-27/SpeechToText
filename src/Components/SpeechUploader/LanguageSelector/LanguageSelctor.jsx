@@ -1,15 +1,19 @@
 import DropDown from "../../../Assets/images/dropDown.png";
+import { setLanguage } from "../../../Redux/languageSlice";
 import styles from "./LanguageSelector.module.css";
 import { useEffect, useRef, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function LanguageSelector() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [language, setLanguage] = useState("persian");
   const dropdownRef = useRef(null);
+  const language = useSelector((state) => state.language.value); // read from store
+  const dispatch = useDispatch(); // dispatch to store
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
   const selectLanguage = (lang) => {
-    setLanguage(lang);
+    dispatch(setLanguage(lang)); // update language
     setIsDropdownOpen(false);
   };
 

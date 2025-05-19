@@ -10,11 +10,13 @@ import RecordVoice from "./RecordVoice/RecordVoice";
 import UploadFile from "./UploadFile/UploadFile";
 import LinkFile from "./LinkFile/LinkFile";
 import LanguageSelector from "./LanguageSelector/LanguageSelctor";
+import { useSelector } from "react-redux";
 
 export default function SpeechUploader() {
   const [isRecord, setIsRecord] = useState(true);
   const [isUpload, setIsUpload] = useState(false);
   const [isLink, setIsLink] = useState(false);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   let mainContent;
   let style;
@@ -31,7 +33,10 @@ export default function SpeechUploader() {
   }
 
   return (
-    <div className={styles.main}>
+    <div
+      className={styles.main}
+      style={isLoggedIn ? null : { marginTop: "8.45%" }}
+    >
       <div>
         <div className={styles.voiceSelection}>
           <button
