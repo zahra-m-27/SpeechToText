@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Archive.css";
 import DownloadIcon from "../../Assets/images/downloadIcon.png";
 import CopyIcon from "../../Assets/images/copyIcon.png";
@@ -12,137 +12,23 @@ import CopyIconHovered from "../../Assets/images/copyIconHovered.png";
 import Layout from "../../Components/Layout/Layout";
 import ShowAudioDetails from "../../Components/ShowAudioDetails/ShowAudioDetails";
 import Pagination from "../../Components/Pagination/Pagination";
+import { useDispatch, useSelector } from "react-redux";
+import { goToPage, setArchiveData } from "../../Redux/archiveSlice";
+// import { useDispatch, useSelector } from "react-redux";
+// import { setArchiveData } from "../../Redux/archiveSlice";
 
 export default function Archive() {
   const [expandedRow, setExpandedRow] = useState(null);
-  const [page, setPage] = useState(1);
+  // const [page, setPage] = useState(1);
   const [hoveredDeleteIndex, setHoveredDeleteIndex] = useState(null);
   const [hoveredCopyIndex, setHoveredCopyIndex] = useState(null);
+  const dispatch = useDispatch();
+  const archiveState = useSelector((state) => state.archive);
+  const userArchive = useSelector((state) => state.user.archive);
 
-  const data = [
-    {
-      name: "khaterate To",
-      date: "1400/08/20",
-      type: ".mp4",
-      duration: "4:38",
-      uploadType: "link",
-    },
-    {
-      name: "https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...",
-      date: "1400/08/20",
-      type: ".wav",
-      duration: "2:14",
-      uploadType: "voice",
-    },
-    {
-      name: "پادکست رادیو راه - فصل دوم - قسمت ششم - راه سروش",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-      uploadType: "upload",
-    },
-    {
-      name: "Random song",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-      uploadType: "link",
-    },
-    {
-      name: "https://irsv.upmusics.com/Downloads/Musics/Sirvan%20K ...",
-      date: "1400/08/20",
-      type: ".mp3",
-      duration: "4:39",
-      uploadType: "upload",
-    },
-    {
-      name: "Random song",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-    },
-    {
-      name: "khaterate To",
-      date: "1400/08/20",
-      type: ".mp4",
-      duration: "4:38",
-    },
-    {
-      name: "https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...",
-      date: "1400/08/20",
-      type: ".wav",
-      duration: "2:14",
-    },
-    {
-      name: "پادکست رادیو راه - فصل دوم - قسمت ششم - راه سروش",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-    },
-    {
-      name: "Random song",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-    },
-    {
-      name: "https://irsv.upmusics.com/Downloads/Musics/Sirvan%20K ...",
-      date: "1400/08/20",
-      type: ".mp3",
-      duration: "4:39",
-    },
-    {
-      name: "khaterate To",
-      date: "1400/08/20",
-      type: ".mp4",
-      duration: "4:38",
-    },
-    {
-      name: "https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...",
-      date: "1400/08/20",
-      type: ".wav",
-      duration: "2:14",
-    },
-    {
-      name: "پادکست رادیو راه - فصل دوم - قسمت ششم - راه سروش",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-    },
-    {
-      name: "https://irsv.upmusics.com/Downloads/Musics/Sirvan%20K ...",
-      date: "1400/08/20",
-      type: ".mp3",
-      duration: "4:39",
-    },
-    {
-      name: "khaterate To",
-      date: "1400/08/20",
-      type: ".mp4",
-      duration: "4:38",
-    },
-    {
-      name: "https://dls.loudmusic.ir/Music/1401/01/Baraye%20-Shervin ...",
-      date: "1400/08/20",
-      type: ".wav",
-      duration: "2:14",
-    },
-    {
-      name: "پادکست رادیو راه - فصل دوم - قسمت ششم - راه سروش",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-    },
-    {
-      name: "Random song",
-      date: "1400/08/19",
-      type: ".mp3",
-      duration: "1:28:18",
-    },
-  ];
-  const ITEMS_PER_PAGE = 8;
+  // const ITEMS_PER_PAGE = 8;
 
-  const pageCount = Math.ceil(data.length / ITEMS_PER_PAGE);
+  // const pageCount = Math.ceil(userArchive.length / ITEMS_PER_PAGE);
   const handleRowClick = (index) => {
     setExpandedRow(expandedRow === index ? null : index);
   };
@@ -160,10 +46,17 @@ export default function Archive() {
     }
   };
 
-  const paginatedData = data.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+  const paginatedData = archiveState.data;
+
+  const handlePageChange = (pageNum) => {
+    dispatch(goToPage(pageNum));
+  };
+
+  useEffect(() => {
+    if (userArchive.length > 0) {
+      dispatch(setArchiveData(userArchive));
+    }
+  }, [userArchive]);
 
   return (
     <Layout>
@@ -282,9 +175,9 @@ export default function Archive() {
             }}
           >
             <Pagination
-              currentPage={page}
-              pageCount={pageCount}
-              onPageChange={setPage}
+              currentPage={archiveState.currentPage}
+              pageCount={archiveState.totalPages}
+              onPageChange={handlePageChange}
             />
           </div>
         </div>
