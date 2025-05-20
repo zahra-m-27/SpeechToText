@@ -8,7 +8,12 @@ import { useRef, useState } from "react";
 import AudioPlayer from "./AudioPlayer/AudioPlayer";
 import { useSelector } from "react-redux";
 
-export default function ShowAudioDetails({ iconsStyle, separatorStyle }) {
+export default function ShowAudioDetails({
+  iconsStyle,
+  separatorStyle,
+  audioUrl,
+  onRestart,
+}) {
   const [activeTab, setActiveTab] = useState("simple");
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef(null);
@@ -61,7 +66,7 @@ export default function ShowAudioDetails({ iconsStyle, separatorStyle }) {
         <div className={styles.left} style={iconsStyle}>
           <img src={DownloadIcon} className={styles.download} />
           <img src={CopyIcon} className={styles.copy} />
-          <button>
+          <button onClick={onRestart}>
             <img src={RestartIcon} className={styles.restart} />
             شروع دوباره
           </button>
@@ -132,7 +137,7 @@ export default function ShowAudioDetails({ iconsStyle, separatorStyle }) {
           <AudioPlayer
             audioRef={audioRef}
             setCurrentTime={setCurrentTime}
-            audioSrc="http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3"
+            audioSrc={audioUrl}
           />
         </div>
       ) : (
@@ -158,7 +163,7 @@ export default function ShowAudioDetails({ iconsStyle, separatorStyle }) {
           <AudioPlayer
             audioRef={audioRef}
             setCurrentTime={setCurrentTime}
-            audioSrc="http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3"
+            audioSrc={audioUrl}
           />
         </div>
       )}

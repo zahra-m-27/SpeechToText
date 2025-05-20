@@ -93,7 +93,10 @@ export default function Archive() {
               key={index}
               className={`archive-row-wrapper ${isExpanded ? "expanded" : ""}`}
             >
-              <div className="archive-row">
+              <div
+                className="archive-row"
+                style={isExpanded ? { paddingBottom: 0 } : null}
+              >
                 <div className="upload-icon" style={uploadIconStyle}>
                   <img
                     style={imgStyle}
