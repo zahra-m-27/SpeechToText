@@ -19,6 +19,7 @@ export default function UploadFile() {
       setSelectedFile(file);
     }
 
+    //use cloudinary to upload files and get a link so that link can be sent to backend
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "SpeechTest");
