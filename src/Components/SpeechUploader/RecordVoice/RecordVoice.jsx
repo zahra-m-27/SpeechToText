@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 export default function RecordVoice() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
@@ -21,11 +22,33 @@ export default function RecordVoice() {
           audioChunksRef.current.push(event.data);
         }
       };
-
-      mediaRecorderRef.current.onstop = () => {
+      mediaRecorderRef.current.onstop = async () => {
         const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        const url = URL.createObjectURL(blob);
-        setAudioUrl(url);
+        const file = new File([blob], "recording.webm", { type: "audio/webm" });
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "SpeechTest");
+        formData.append("cloud_name", "dik8zqi6k");
+
+        try {
+          const res = await fetch(
+            "https://api.cloudinary.com/v1_1/dik8zqi6k/video/upload",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          const data = await res.json();
+          console.log("Uploaded file URL:", data.secure_url);
+
+          setAudioUrl(data.secure_url);
+        } catch (err) {
+          console.error("Upload failed", err);
+        } finally {
+          setIsUploading(false);
+        }
       };
 
       mediaRecorderRef.current.start();
@@ -42,7 +65,11 @@ export default function RecordVoice() {
 
   return (
     <>
-      {audioUrl ? (
+      {isUploading ? (
+        <p>
+          در حال بارگذاری <br /> لطفا صبر کنید ...
+        </p>
+      ) : audioUrl ? (
         <ShowAudioDetails
           audioUrl={audioUrl}
           onRestart={() => setAudioUrl(null)}
