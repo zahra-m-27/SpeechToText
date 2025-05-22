@@ -2,6 +2,7 @@ import { useState } from "react";
 import LinkIcon from "../../../Assets/images/linkIconWhite.png";
 import styles from "./LinkFile.module.css";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
+import { transcribeUrlAPI } from "../../../API/roshan";
 
 export default function LinkFile() {
   const [url, setUrl] = useState("");
@@ -16,21 +17,7 @@ export default function LinkFile() {
     setErrorMessage("");
 
     try {
-      const res = await fetch("/api/roshan/api/transcribe_files/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${import.meta.env.VITE_API_TOKEN}`,
-        },
-        body: JSON.stringify({ media_urls: [url] }),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`API ${res.status}: ${text}`);
-      }
-
-      const data = await res.json();
+      const data = await transcribeUrlAPI(url);
       console.log("Roshan API response:", data);
       setStatus("uploaded");
     } catch (err) {
@@ -82,7 +69,14 @@ export default function LinkFile() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />
-        <div className={styles.icon} onClick={handleSubmit}>
+        <div
+          className={styles.icon}
+          onClick={url.trim() ? handleSubmit : undefined}
+          style={{
+            opacity: url.trim() ? 1 : 0.4,
+            cursor: url.trim() ? "pointer" : "not-allowed",
+          }}
+        >
           <img src={LinkIcon} alt="Submit Link" />
         </div>
       </div>
