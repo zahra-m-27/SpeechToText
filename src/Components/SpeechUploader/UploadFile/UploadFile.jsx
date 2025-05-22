@@ -1,12 +1,14 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import UploadIcon from "../../../Assets/images/uploadIconWhite.png";
 import styles from "./UploadFile.module.css";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
+import { transcribeFileAPI } from "../../../API/roshan";
 
 export default function UploadFile() {
   const fileInputRef = useRef(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileUrl, setFileUrl] = useState(null);
+  const [status, setStatus] = useState("idle"); // "idle" | "uploading" | "uploaded" | "error"
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [error, setError] = useState("");
 
   const handleButtonClick = () => {
     fileInputRef.current.click();
@@ -15,72 +17,73 @@ export default function UploadFile() {
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    if (file) {
-      setSelectedFile(file);
-    }
 
-    //use cloudinary to upload files and get a link so that link can be sent to backend
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "SpeechTest");
-    formData.append("cloud_name", "dik8zqi6k");
+    setStatus("uploading");
+    setError("");
 
     try {
-      const res = await fetch(
-        "https://api.cloudinary.com/v1_1/dik8zqi6k/auto/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      const data = await res.json();
-      console.log("Cloudinary response:", data);
-      setFileUrl(data.secure_url);
+      const data = await transcribeFileAPI(file);
+      console.log("Roshan API Response:", data);
+
+      // Use local URL for playback
+      setAudioUrl(URL.createObjectURL(file));
+      setStatus("uploaded");
     } catch (err) {
-      console.error("Upload failed:", err);
+      console.error("Error:", err);
+      setError("ارسال فایل با خطا مواجه شد. لطفاً دوباره امتحان کنید.");
+      setStatus("error");
     }
   };
 
+  if (status === "uploading") {
+    return (
+      <p>
+        در حال بارگذاری فایل <br />
+        لطفا صبر کنید ...
+      </p>
+    );
+  }
+
+  if (status === "uploaded" && audioUrl) {
+    return (
+      <ShowAudioDetails
+        audioUrl={audioUrl}
+        onRestart={() => {
+          setAudioUrl(null);
+          setStatus("idle");
+        }}
+      />
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div>
+        <p style={{ color: "red" }}>{error}</p>
+        <button className={styles.restart} onClick={() => setStatus("idle")}>
+          تلاش مجدد
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
-      {fileUrl ? (
-        <ShowAudioDetails
-          audioUrl={fileUrl}
-          onRestart={() => {
-            setFileUrl(null);
-            setSelectedFile(null);
-          }}
-        />
-      ) : (
-        <>
-          {selectedFile ? (
-            <>
-              <p>
-                در حال بارگذاری فایل <br />
-                لطفا صبر کنید ...
-              </p>
-            </>
-          ) : (
-            <>
-              <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-                accept="audio/*,video/*"
-              />
-              <button className={styles.file} onClick={handleButtonClick}>
-                <img src={UploadIcon} />
-              </button>
-              <p>
-                برای بارگذاری فایل گفتاری (صوتی/تصویری)، دکمه را فشار دهید{" "}
-                <br />
-                متن پیاده شده آن، در اینجا ظاهر می شود
-              </p>
-            </>
-          )}
-        </>
-      )}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+        accept="audio/*,video/*"
+      />
+      <button className={styles.file} onClick={handleButtonClick}>
+        <img src={UploadIcon} />
+      </button>
+      <p>
+        برای بارگذاری فایل گفتاری (صوتی/تصویری)، دکمه را فشار دهید
+        <br />
+        متن پیاده شده آن، در اینجا ظاهر می شود
+      </p>
     </>
   );
 }

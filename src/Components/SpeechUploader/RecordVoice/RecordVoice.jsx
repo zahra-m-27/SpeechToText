@@ -1,12 +1,14 @@
+import { useState, useRef } from "react";
 import MicIcon from "../../../Assets/images/micIconWhite.png";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
 import styles from "./RecordVoice.module.css";
-import { useState, useRef } from "react";
+import { transcribeFileAPI } from "../../../API/roshan";
 
 export default function RecordVoice() {
-  const [isRecording, setIsRecording] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | recording | uploading | uploaded | error
   const [audioUrl, setAudioUrl] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState("");
+
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
@@ -22,76 +24,88 @@ export default function RecordVoice() {
           audioChunksRef.current.push(event.data);
         }
       };
+
       mediaRecorderRef.current.onstop = async () => {
+        //prevents mic from staying active in the browser after recording is done
+        stream.getTracks().forEach((track) => track.stop());
         const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const file = new File([blob], "recording.webm", { type: "audio/webm" });
 
-        setIsUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "SpeechTest");
-        formData.append("cloud_name", "dik8zqi6k");
+        setStatus("uploading");
 
         try {
-          const res = await fetch(
-            "https://api.cloudinary.com/v1_1/dik8zqi6k/video/upload",
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-          const data = await res.json();
-          console.log("Uploaded file URL:", data.secure_url);
-
-          setAudioUrl(data.secure_url);
+          const data = await transcribeFileAPI(file);
+          console.log("Roshan API Response:", data[0]);
+          setAudioUrl(URL.createObjectURL(file));
+          setStatus("uploaded");
         } catch (err) {
-          console.error("Upload failed", err);
-        } finally {
-          setIsUploading(false);
+          console.error("Upload failed:", err);
+          setError("ارسال فایل با خطا مواجه شد. لطفاً دوباره امتحان کنید.");
+          setStatus("error");
         }
       };
 
       mediaRecorderRef.current.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error("Microphone access denied or error:", error);
+      setStatus("recording");
+    } catch (err) {
+      console.error("Microphone error:", err);
+      setError("عدم دسترسی به میکروفن.");
+      setStatus("error");
     }
   };
 
   const stopRecording = () => {
     mediaRecorderRef.current?.stop();
-    setIsRecording(false);
   };
+
+  if (status === "uploading") {
+    return (
+      <p>
+        در حال بارگذاری <br /> لطفا صبر کنید ...
+      </p>
+    );
+  }
+
+  if (status === "uploaded" && audioUrl) {
+    return (
+      <ShowAudioDetails
+        audioUrl={audioUrl}
+        onRestart={() => {
+          setAudioUrl(null);
+          setStatus("idle");
+          setError("");
+        }}
+      />
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div>
+        <p style={{ color: "red" }}>{error}</p>
+        <button className={styles.restart} onClick={() => setStatus("idle")}>
+          تلاش مجدد
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
-      {isUploading ? (
-        <p>
-          در حال بارگذاری <br /> لطفا صبر کنید ...
-        </p>
-      ) : audioUrl ? (
-        <ShowAudioDetails
-          audioUrl={audioUrl}
-          onRestart={() => setAudioUrl(null)}
-        />
+      <button
+        className={styles.mic}
+        onClick={status === "recording" ? stopRecording : startRecording}
+      >
+        <img src={MicIcon} />
+      </button>
+      {status === "recording" ? (
+        <p>در حال ضبط ...</p>
       ) : (
-        <>
-          <button
-            className={styles.mic}
-            onClick={isRecording ? stopRecording : startRecording}
-          >
-            <img src={MicIcon} />
-          </button>
-          {isRecording ? (
-            <p>در حال ضبط ...</p>
-          ) : (
-            <p>
-              برای شروع به صحبت، دکمه را فشار دهید
-              <br />
-              متن پیاده شده آن، در اینجا ظاهر شود
-            </p>
-          )}
-        </>
+        <p>
+          برای شروع به صحبت، دکمه را فشار دهید
+          <br />
+          متن پیاده شده آن، در اینجا ظاهر شود
+        </p>
       )}
     </>
   );
