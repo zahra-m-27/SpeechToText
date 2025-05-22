@@ -11,3 +11,18 @@
   height: 27px;
   vertical-align: middle;
 }
+
+.restart {
+  background-color: #118ad3;
+  border: 1px solid #118ad3;
+  border-radius: 20px;
+  font-family: "Vazirmatn";
+  font-weight: 400;
+  font-size: 14px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  cursor: pointer;
+}

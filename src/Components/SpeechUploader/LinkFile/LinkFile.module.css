@@ -22,12 +22,11 @@
   outline: none;
 }
 
-.link.focused {
+.link:has(input:focus) {
   box-shadow: 0 0 0 2px rgba(255, 22, 84, 0.7);
 }
 
-.icon,
-.submit {
+.icon {
   width: 30px;
   height: 30px;
   background-color: #ff1654;
@@ -35,6 +34,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 .icon img {
@@ -42,8 +42,17 @@
   height: 14px;
 }
 
-.submit {
-  border: none;
+.restart {
+  background-color: #118ad3;
+  border: 1px solid #118ad3;
+  border-radius: 20px;
+  font-family: "Vazirmatn";
+  font-weight: 400;
+  font-size: 14px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
   cursor: pointer;
-  margin-left: 33px;
 }
