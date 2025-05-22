@@ -1,11 +1,23 @@
-// archiveSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { listAllTranscripts } from "../API/roshan";
+
+export const fetchArchiveFromAPI = createAsyncThunk(
+  "archive/fetchArchive",
+  async (_, thunkAPI) => {
+    try {
+      const response = await listAllTranscripts();
+      return response.results; // use only "results" field
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
 
 const archiveSlice = createSlice({
   name: "archive",
   initialState: {
     data: [], // current visible list (e.g., page 1)
-    allData: [], // optional: store everything here for offline pagination
+    allData: [], //store everything here for offline pagination
     currentPage: 1,
     pageSize: 5,
     totalPages: 0,
@@ -39,8 +51,41 @@ const archiveSlice = createSlice({
       state.totalPages = 0;
     },
     addToArchive: (state, action) => {
-      state.allData.push(action.payload);
+      state.allData.unshift(action.payload); // Add to beginning
+      state.totalPages = Math.ceil(state.allData.length / state.pageSize);
+      state.data = state.allData.slice(0, state.pageSize); // Recalculate visible data
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchArchiveFromAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchArchiveFromAPI.fulfilled, (state, action) => {
+        const data = action.payload.map((item) => ({
+          name: item.filename,
+          date: new Date(item.processed).toLocaleDateString("fa-IR"),
+          type: item.filename?.split(".").pop() || "",
+          duration: item.duration.replace("0:", ""), // crude fix for display
+          uploadType: item.url.includes("recording")
+            ? "voice"
+            : item.url.includes("files")
+            ? "upload"
+            : "link",
+          ...item,
+        }));
+
+        state.allData = data;
+        state.totalPages = Math.ceil(data.length / state.pageSize);
+        state.data = data.slice(0, state.pageSize);
+        state.currentPage = 1;
+        state.loading = false;
+      })
+      .addCase(fetchArchiveFromAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
