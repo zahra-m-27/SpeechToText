@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import MicIcon from "../../../Assets/images/micIconWhite.png";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
 import styles from "./RecordVoice.module.css";
+import { transcribeFileAPI } from "../../../API/roshan";
 
 export default function RecordVoice() {
   const [status, setStatus] = useState("idle"); // idle | recording | uploading | uploaded | error
@@ -25,27 +26,16 @@ export default function RecordVoice() {
       };
 
       mediaRecorderRef.current.onstop = async () => {
+        //prevents mic from staying active in the browser after recording is done
+        stream.getTracks().forEach((track) => track.stop());
         const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const file = new File([blob], "recording.webm", { type: "audio/webm" });
 
         setStatus("uploading");
-        const formData = new FormData();
-        formData.append("media", file);
 
         try {
-          const res = await fetch("/api/roshan/api/transcribe_files/", {
-            method: "POST",
-            headers: {
-              Authorization: `Token ${import.meta.env.VITE_API_TOKEN}`,
-            },
-            body: formData,
-          });
-
-          if (!res.ok) throw new Error("Failed to upload file to Roshan");
-
-          const data = await res.json();
-          console.log("Roshan API Response:", data);
-
+          const data = await transcribeFileAPI(file);
+          console.log("Roshan API Response:", data[0]);
           setAudioUrl(URL.createObjectURL(file));
           setStatus("uploaded");
         } catch (err) {
@@ -83,6 +73,7 @@ export default function RecordVoice() {
         onRestart={() => {
           setAudioUrl(null);
           setStatus("idle");
+          setError("");
         }}
       />
     );
