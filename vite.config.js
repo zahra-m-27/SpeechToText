@@ -8,10 +8,10 @@ export default defineConfig({
   server: {
     open: true,
     proxy: {
-      "/api/roshan": {
+      "/roshan": {
         target: "https://harf.roshan-ai.ir",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/roshan/, ""),
+        rewrite: (path) => path.replace(/^\/roshan/, ""),
       },
     },
   },
