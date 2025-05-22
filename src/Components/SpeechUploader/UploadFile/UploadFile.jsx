@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import UploadIcon from "../../../Assets/images/uploadIconWhite.png";
 import styles from "./UploadFile.module.css";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
+import { transcribeFileAPI } from "../../../API/roshan";
 
 export default function UploadFile() {
   const fileInputRef = useRef(null);
@@ -20,21 +21,8 @@ export default function UploadFile() {
     setStatus("uploading");
     setError("");
 
-    const formData = new FormData();
-    formData.append("media", file);
-
     try {
-      const res = await fetch("/api/roshan/api/transcribe_files/", {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${import.meta.env.VITE_API_TOKEN}`,
-        },
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Failed to upload file to Roshan");
-
-      const data = await res.json();
+      const data = await transcribeFileAPI(file);
       console.log("Roshan API Response:", data);
 
       // Use local URL for playback
