@@ -3,11 +3,15 @@ import LinkIcon from "../../../Assets/images/linkIconWhite.png";
 import styles from "./LinkFile.module.css";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
 import { transcribeUrlAPI } from "../../../API/roshan";
+import { addToArchive } from "../../../Redux/archiveSlice";
+import { useDispatch } from "react-redux";
 
 export default function LinkFile() {
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState("idle"); // "idle" | "uploading" | "uploaded" | "error"
   const [errorMessage, setErrorMessage] = useState("");
+  const [transcript, setTranscript] = useState(null);
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +23,23 @@ export default function LinkFile() {
     try {
       const data = await transcribeUrlAPI(url);
       console.log("Roshan API response:", data);
+      setTranscript({
+        audioUrl: data[0].media_url,
+        segments: data[0].segments,
+        stats: data[0].stats,
+      });
+      const newItem = {
+        name: url || data[0].mediaUrl.split("/").pop()?.split("?")[0],
+        date: new Date().toLocaleDateString("fa-IR"),
+        type: "." + data[0].media_url?.split(".").pop() || "",
+        duration: data[0].duration.replace("0:", ""),
+        uploadType: "link",
+        url: data[0].media_url,
+        segments: data[0].segments,
+        stats: data[0].stats,
+      };
+      dispatch(addToArchive(newItem));
+
       setStatus("uploaded");
     } catch (err) {
       console.error("Error sending link to Roshan:", err);
@@ -39,10 +60,12 @@ export default function LinkFile() {
   if (status === "uploaded") {
     return (
       <ShowAudioDetails
-        audioUrl={url}
+        audioUrl={transcript.audioUrl}
+        segments={transcript.segments}
         onRestart={() => {
           setUrl("");
           setStatus("idle");
+          setTranscript(null);
         }}
       />
     );
