@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { listAllTranscripts } from "../API/roshan";
 
+//fetch archive list from backend
 export const fetchArchiveFromAPI = createAsyncThunk(
   "archive/fetchArchive",
   async (_, thunkAPI) => {
@@ -19,7 +20,7 @@ const archiveSlice = createSlice({
     data: [], // current visible list (e.g., page 1)
     allData: [], //store everything here for offline pagination
     currentPage: 1,
-    pageSize: 5,
+    pageSize: 8,
     totalPages: 0,
     loading: false,
     error: null,
@@ -55,6 +56,14 @@ const archiveSlice = createSlice({
       state.totalPages = Math.ceil(state.allData.length / state.pageSize);
       state.data = state.allData.slice(0, state.pageSize); // Recalculate visible data
     },
+    deleteFromArchive: (state, action) => {
+      const idToDelete = action.payload;
+      state.allData = state.allData.filter((item) => item.id !== idToDelete);
+      state.totalPages = Math.ceil(state.allData.length / state.pageSize);
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end = state.currentPage * state.pageSize;
+      state.data = state.allData.slice(start, end);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -66,8 +75,8 @@ const archiveSlice = createSlice({
         const data = action.payload.map((item) => ({
           name: item.filename,
           date: new Date(item.processed).toLocaleDateString("fa-IR"),
-          type: item.filename?.split(".").pop() || "",
-          duration: item.duration.replace("0:", ""), // crude fix for display
+          type: "." + item.filename?.split(".").pop() || "",
+          duration: item.duration.replace("0:", ""),
           uploadType: item.url.includes("recording")
             ? "voice"
             : item.url.includes("files")
@@ -95,6 +104,7 @@ export const {
   setPageSize,
   clearArchive,
   addToArchive,
+  deleteFromArchive,
 } = archiveSlice.actions;
 
 export default archiveSlice.reducer;
