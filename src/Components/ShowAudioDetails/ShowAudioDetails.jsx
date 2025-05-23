@@ -4,29 +4,33 @@ import RestartIcon from "../../Assets/images/restartIcon.png";
 import TextIcon from "../../Assets/images/textIcon.png";
 import TimeIcon from "../../Assets/images/timeIcon.png";
 import styles from "./ShowAudioDetails.module.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AudioPlayer from "./AudioPlayer/AudioPlayer";
 import { useSelector } from "react-redux";
+
+function timeToSeconds(timeStr) {
+  if (!timeStr) return 0;
+  const [h, m, s] = timeStr.split(":").map(Number);
+  return h * 3600 + m * 60 + s;
+}
 
 export default function ShowAudioDetails({
   iconsStyle,
   separatorStyle,
   audioUrl,
   onRestart,
+  segments,
 }) {
   const [activeTab, setActiveTab] = useState("simple");
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef(null);
+  const segmentRefs = useRef([]);
   const language = useSelector((state) => state.language.value);
-
-  const transcriptData = [
-    { start: "0", end: "3", label: "[با]" },
-    { start: "3", end: "6", label: "[---]" },
-    { start: "6", end: "8", label: "[---]" },
-    { start: "8", end: "12", label: "[با]" },
-    { start: "12", end: "14", label: "و[---]" },
-    { start: "14", end: "16", label: "[---]" },
-  ];
+  const activeIndex = segments.findIndex(
+    (seg) =>
+      currentTime >= timeToSeconds(seg.start) &&
+      currentTime < timeToSeconds(seg.end)
+  );
 
   const handleJump = (time) => {
     if (audioRef.current) {
@@ -35,15 +39,27 @@ export default function ShowAudioDetails({
     }
   };
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
+  function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60)
       .toString()
       .padStart(2, "0");
-    const secs = Math.floor(seconds % 60)
+    const s = Math.floor(seconds % 60)
       .toString()
       .padStart(2, "0");
-    return `${mins}:${secs}`;
-  };
+    return h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`;
+  }
+
+  useEffect(() => {
+    const activeEl = segmentRefs.current[activeIndex];
+    if (activeEl && activeEl.scrollIntoView) {
+      activeEl.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [activeIndex, segments]);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -83,55 +99,19 @@ export default function ShowAudioDetails({
                   : { textAlign: "right" }
               }
             >
-              [با][---][---] [با] و[---][---] [با][---][---][---][---] کجایی تو
-              [خوش] می دیدی من خسته شدم [ما را] [به] این [زودی] چه جوری شد [عشق
-              شدی] به این است[---] [آخرش] سی با فکر [و] چقدر [نزار می خوام] که
-              [چشم تو] [و با رفت][---][---][---][---][---][---][---][---] سخت
-              [آرام] ولی ازت می خوام[---] بر نگردی هر کسی که به [تو] باشه[---]
-              کاشکی تو منو [بردی] [که چشمک][---] با[---][---][---][---][---]
-              [ابو][---] [با] و و و و و [او] [با][---][---] [با] و[---][---]
-              [با][---][---][---][---] کجایی تو [خوش] می دیدی من خسته شدم [ما
-              را] [به] این [زودی] چه جوری شد [عشق شدی] به این است[---] [آخرش] سی
-              با فکر [و] چقدر [نزار می خوام] که [چشم تو] [و با
-              رفت][---][---][---][---][---][---][---][---] سخت [آرام] ولی ازت می
-              خوام[---] بر نگردی هر کسی که به [تو] باشه[---] کاشکی تو منو [بردی]
-              [که چشمک][---] با[---][---][---][---][---] [ابو][---] [با] و و و و
-              و [او] [با][---][---] [با] و[---][---] [با][---][---][---][---]
-              کجایی تو [خوش] می دیدی من خسته شدم [ما را] [به] این [زودی] چه جوری
-              شد [عشق شدی] به این است[---] [آخرش] سی با فکر [و] چقدر [نزار می
-              خوام] که [چشم تو] [و با
-              رفت][---][---][---][---][---][---][---][---] سخت [آرام] ولی ازت می
-              خوام[---] بر نگردی هر کسی که به [تو] باشه[---] کاشکی تو منو [بردی]
-              [که چشمک][---] با[---][---][---][---][---] [ابو][---] [با] و و و و
-              و [او] [با][---][---] [با] و[---][---] [با][---][---][---][---]
-              کجایی تو [خوش] می دیدی من خسته شدم [ما را] [به] این [زودی] چه جوری
-              شد [عشق شدی] به این است[---] [آخرش] سی با فکر [و] چقدر [نزار می
-              خوام] که [چشم تو] [و با
-              رفت][---][---][---][---][---][---][---][---] سخت [آرام] ولی ازت می
-              خوام[---] بر نگردی هر کسی که به [تو] باشه[---] کاشکی تو منو [بردی]
-              [که چشمک][---] با[---][---][---][---][---] [ابو][---] [با] و و و و
-              و [او] [با][---][---] [با] و[---][---] [با][---][---][---][---]
-              کجایی تو [خوش] می دیدی من خسته شدم [ما را] [به] این [زودی] چه جوری
-              شد [عشق شدی] به این است[---] [آخرش] سی با فکر [و] چقدر [نزار می
-              خوام] که [چشم تو] [و با
-              رفت][---][---][---][---][---][---][---][---] سخت [آرام] ولی ازت می
-              خوام[---] بر نگردی هر کسی که به [تو] باشه[---] کاشکی تو منو [بردی]
-              [که چشمک][---] با[---][---][---][---][---] [ابو][---] [با] و و و و
-              و [او] [با][---][---] [با] و[---][---] [با][---][---][---][---]
-              کجایی تو [خوش] می دیدی من خسته شدم [ما را] [به] این [زودی] چه جوری
-              شد [عشق شدی] به این است[---] [آخرش] سی با فکر [و] چقدر [نزار می
-              خوام] که [چشم تو] [و با
-              رفت][---][---][---][---][---][---][---][---] سخت [آرام] ولی ازت می
-              خوام[---] بر نگردی هر کسی که به [تو] باشه[---] کاشکی تو منو [بردی]
-              [که چشمک][---] با[---][---][---][---][---] [ابو][---] [با] و و و و
-              و [او] [با][---][---] [با] و[---][---] [با][---][---][---][---]
-              کجایی تو [خوش] می دیدی من خسته شدم [ما را] [به] این [زودی] چه جوری
-              شد [عشق شدی] به این است[---] [آخرش] سی با فکر [و] چقدر [نزار می
-              خوام] که [چشم تو] [و با
-              رفت][---][---][---][---][---][---][---][---] سخت [آرام] ولی ازت می
-              خوام[---] بر نگردی هر کسی که به [تو] باشه[---] کاشکی تو منو [بردی]
-              [که چشمک][---] با[---][---][---][---][---] [ابو][---] [با] و و و و
-              و [او]
+              {segments.map((item, index) => {
+                const isActive = index === activeIndex;
+
+                return (
+                  <span
+                    key={index}
+                    className={isActive ? styles.activeRow : null}
+                    ref={(el) => (segmentRefs.current[index] = el)}
+                  >
+                    {`${item.text} `}
+                  </span>
+                );
+              })}
             </p>
           </div>
           <AudioPlayer
@@ -143,19 +123,19 @@ export default function ShowAudioDetails({
       ) : (
         <div className={styles.test}>
           <ul className={styles.transcriptContainer}>
-            {transcriptData.map((item, index) => {
-              const isActive =
-                currentTime >= item.start && currentTime < item.end;
+            {segments.map((item, index) => {
+              const isActive = index === activeIndex;
 
               return (
                 <li
                   onClick={() => handleJump(item.start)}
                   className={isActive ? styles.activeRow : null}
                   key={index}
+                  ref={(el) => (segmentRefs.current[index] = el)}
                 >
-                  <span>{formatTime(item.end)}</span>
-                  <span>{formatTime(item.start)}</span>
-                  <span className={styles.label}>{item.label}</span>
+                  <span>{formatTime(timeToSeconds(item.end))}</span>
+                  <span>{formatTime(timeToSeconds(item.start))}</span>
+                  <span className={styles.label}>{item.text}</span>
                 </li>
               );
             })}
