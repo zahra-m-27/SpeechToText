@@ -13,22 +13,16 @@ import Layout from "../../Components/Layout/Layout";
 import ShowAudioDetails from "../../Components/ShowAudioDetails/ShowAudioDetails";
 import Pagination from "../../Components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
-import { goToPage, setArchiveData } from "../../Redux/archiveSlice";
-// import { useDispatch, useSelector } from "react-redux";
-// import { setArchiveData } from "../../Redux/archiveSlice";
+import { fetchArchiveFromAPI, goToPage } from "../../Redux/archiveSlice";
 
 export default function Archive() {
   const [expandedRow, setExpandedRow] = useState(null);
-  // const [page, setPage] = useState(1);
   const [hoveredDeleteIndex, setHoveredDeleteIndex] = useState(null);
   const [hoveredCopyIndex, setHoveredCopyIndex] = useState(null);
   const dispatch = useDispatch();
   const archiveState = useSelector((state) => state.archive);
-  const userArchive = useSelector((state) => state.user.archive);
+  const paginatedData = archiveState.data;
 
-  // const ITEMS_PER_PAGE = 8;
-
-  // const pageCount = Math.ceil(userArchive.length / ITEMS_PER_PAGE);
   const handleRowClick = (index) => {
     setExpandedRow(expandedRow === index ? null : index);
   };
@@ -46,17 +40,29 @@ export default function Archive() {
     }
   };
 
-  const paginatedData = archiveState.data;
-
   const handlePageChange = (pageNum) => {
     dispatch(goToPage(pageNum));
   };
 
+  function formatDuration(duration) {
+    if (!duration || typeof duration !== "string") return "00:00";
+
+    const parts = duration.split(":");
+    if (parts.length < 3) return duration;
+
+    let [hours, minutes, rest] = parts;
+    hours = parseInt(hours, 10);
+    minutes = minutes.padStart(2, "0");
+    let seconds = rest.split(".")[0].padStart(2, "0");
+
+    return hours > 0
+      ? `${hours.toString().padStart(2, "0")}:${minutes}:${seconds}`
+      : `${minutes}:${seconds}`;
+  }
+
   useEffect(() => {
-    if (userArchive.length > 0) {
-      dispatch(setArchiveData(userArchive));
-    }
-  }, [userArchive]);
+    dispatch(fetchArchiveFromAPI());
+  }, [dispatch]);
 
   return (
     <Layout>
@@ -116,7 +122,7 @@ export default function Archive() {
 
                 <div className="date">{file.date}</div>
                 <div className="type">{file.type}</div>
-                <div className="duration">{file.duration}</div>
+                <div className="duration">{formatDuration(file.duration)}</div>
 
                 <div className="icons">
                   <div className="downloadIcon">
@@ -157,6 +163,8 @@ export default function Archive() {
               {isExpanded && (
                 <div className="archive-details">
                   <ShowAudioDetails
+                    audioUrl={file.url}
+                    segments={file.segments}
                     iconsStyle={{ display: "none" }}
                     separatorStyle={{ width: "26%", margin: "17px 0 15px" }}
                   />
