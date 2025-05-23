@@ -5,7 +5,6 @@ import ExitIcon from "../../Assets/images/exitIcon.png";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logIn, logOut } from "../../Redux/userSlice";
-import { setArchiveData } from "../../Redux/archiveSlice";
 import "./Header.css";
 
 export default function Header() {
@@ -64,7 +63,6 @@ export default function Header() {
                   },
                 })
               );
-              dispatch(setArchiveData(userData.archive));
             }}
           >
             <img src={UserIcon} className="userIcon" />
