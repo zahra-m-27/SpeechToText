@@ -13,7 +13,12 @@ import Layout from "../../Components/Layout/Layout";
 import ShowAudioDetails from "../../Components/ShowAudioDetails/ShowAudioDetails";
 import Pagination from "../../Components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchArchiveFromAPI, goToPage } from "../../Redux/archiveSlice";
+import {
+  deleteFromArchive,
+  fetchArchiveFromAPI,
+  goToPage,
+} from "../../Redux/archiveSlice";
+import { deleteTranscript } from "../../API/roshan";
 
 export default function Archive() {
   const [expandedRow, setExpandedRow] = useState(null);
@@ -59,6 +64,40 @@ export default function Archive() {
       ? `${hours.toString().padStart(2, "0")}:${minutes}:${seconds}`
       : `${minutes}:${seconds}`;
   }
+
+  const handleCopy = (segments) => {
+    const fullText = segments.map((s) => s.text).join(" ");
+    navigator.clipboard
+      .writeText(fullText)
+      .then(() => alert("متن کپی شد!"))
+      .catch(() => alert("خطا در کپی کردن متن"));
+  };
+
+  const handleDownloadAudio = (audioUrl) => {
+    if (!audioUrl) return;
+
+    const link = document.createElement("a");
+    // link.style.display = "none";
+    link.href = audioUrl;
+
+    //try to get filename from URL
+    const fileName =
+      audioUrl?.split("/").pop()?.split("?")[0] || `audio-${Date.now()}.webm`;
+
+    link.download = decodeURIComponent(fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteTranscript(id);
+      dispatch(deleteFromArchive(id));
+    } catch (err) {
+      alert("خطا در حذف فایل: " + err.message);
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchArchiveFromAPI());
@@ -125,7 +164,10 @@ export default function Archive() {
                 <div className="duration">{formatDuration(file.duration)}</div>
 
                 <div className="icons">
-                  <div className="downloadIcon">
+                  <div
+                    className="downloadIcon"
+                    onClick={() => handleDownloadAudio(file.url)}
+                  >
                     <img src={DownloadIcon} alt="download" />
                     <div className="tooltip">۳.۱۸ مگابایت</div>
                   </div>
@@ -135,6 +177,7 @@ export default function Archive() {
                   <div
                     onMouseEnter={() => setHoveredCopyIndex(index)}
                     onMouseLeave={() => setHoveredCopyIndex(null)}
+                    onClick={() => handleCopy(file.segments)}
                   >
                     <img
                       className="copyIcon"
@@ -148,6 +191,7 @@ export default function Archive() {
                     className="deleteIcon"
                     onMouseEnter={() => setHoveredDeleteIndex(index)}
                     onMouseLeave={() => setHoveredDeleteIndex(null)}
+                    onClick={() => handleDelete(file.id)}
                   >
                     <img
                       src={
