@@ -13,22 +13,21 @@ import Layout from "../../Components/Layout/Layout";
 import ShowAudioDetails from "../../Components/ShowAudioDetails/ShowAudioDetails";
 import Pagination from "../../Components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
-import { goToPage, setArchiveData } from "../../Redux/archiveSlice";
-// import { useDispatch, useSelector } from "react-redux";
-// import { setArchiveData } from "../../Redux/archiveSlice";
+import {
+  deleteFromArchive,
+  fetchArchiveFromAPI,
+  goToPage,
+} from "../../Redux/archiveSlice";
+import { deleteTranscript } from "../../API/roshan";
 
 export default function Archive() {
   const [expandedRow, setExpandedRow] = useState(null);
-  // const [page, setPage] = useState(1);
   const [hoveredDeleteIndex, setHoveredDeleteIndex] = useState(null);
   const [hoveredCopyIndex, setHoveredCopyIndex] = useState(null);
   const dispatch = useDispatch();
   const archiveState = useSelector((state) => state.archive);
-  const userArchive = useSelector((state) => state.user.archive);
+  const paginatedData = archiveState.data;
 
-  // const ITEMS_PER_PAGE = 8;
-
-  // const pageCount = Math.ceil(userArchive.length / ITEMS_PER_PAGE);
   const handleRowClick = (index) => {
     setExpandedRow(expandedRow === index ? null : index);
   };
@@ -46,17 +45,63 @@ export default function Archive() {
     }
   };
 
-  const paginatedData = archiveState.data;
-
   const handlePageChange = (pageNum) => {
     dispatch(goToPage(pageNum));
   };
 
-  useEffect(() => {
-    if (userArchive.length > 0) {
-      dispatch(setArchiveData(userArchive));
+  function formatDuration(duration) {
+    if (!duration || typeof duration !== "string") return "00:00";
+
+    const parts = duration.split(":");
+    if (parts.length < 3) return duration;
+
+    let [hours, minutes, rest] = parts;
+    hours = parseInt(hours, 10);
+    minutes = minutes.padStart(2, "0");
+    let seconds = rest.split(".")[0].padStart(2, "0");
+
+    return hours > 0
+      ? `${hours.toString().padStart(2, "0")}:${minutes}:${seconds}`
+      : `${minutes}:${seconds}`;
+  }
+
+  const handleCopy = (segments) => {
+    const fullText = segments.map((s) => s.text).join(" ");
+    navigator.clipboard
+      .writeText(fullText)
+      .then(() => alert("متن کپی شد!"))
+      .catch(() => alert("خطا در کپی کردن متن"));
+  };
+
+  const handleDownloadAudio = (audioUrl) => {
+    if (!audioUrl) return;
+
+    const link = document.createElement("a");
+    // link.style.display = "none";
+    link.href = audioUrl;
+
+    //try to get filename from URL
+    const fileName =
+      audioUrl?.split("/").pop()?.split("?")[0] || `audio-${Date.now()}.webm`;
+
+    link.download = decodeURIComponent(fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteTranscript(id);
+      dispatch(deleteFromArchive(id));
+    } catch (err) {
+      alert("خطا در حذف فایل: " + err.message);
     }
-  }, [userArchive]);
+  };
+
+  useEffect(() => {
+    dispatch(fetchArchiveFromAPI());
+  }, [dispatch]);
 
   return (
     <Layout>
@@ -116,10 +161,13 @@ export default function Archive() {
 
                 <div className="date">{file.date}</div>
                 <div className="type">{file.type}</div>
-                <div className="duration">{file.duration}</div>
+                <div className="duration">{formatDuration(file.duration)}</div>
 
                 <div className="icons">
-                  <div className="downloadIcon">
+                  <div
+                    className="downloadIcon"
+                    onClick={() => handleDownloadAudio(file.url)}
+                  >
                     <img src={DownloadIcon} alt="download" />
                     <div className="tooltip">۳.۱۸ مگابایت</div>
                   </div>
@@ -129,6 +177,7 @@ export default function Archive() {
                   <div
                     onMouseEnter={() => setHoveredCopyIndex(index)}
                     onMouseLeave={() => setHoveredCopyIndex(null)}
+                    onClick={() => handleCopy(file.segments)}
                   >
                     <img
                       className="copyIcon"
@@ -142,6 +191,7 @@ export default function Archive() {
                     className="deleteIcon"
                     onMouseEnter={() => setHoveredDeleteIndex(index)}
                     onMouseLeave={() => setHoveredDeleteIndex(null)}
+                    onClick={() => handleDelete(file.id)}
                   >
                     <img
                       src={
@@ -157,6 +207,8 @@ export default function Archive() {
               {isExpanded && (
                 <div className="archive-details">
                   <ShowAudioDetails
+                    audioUrl={file.url}
+                    segments={file.segments}
                     iconsStyle={{ display: "none" }}
                     separatorStyle={{ width: "26%", margin: "17px 0 15px" }}
                   />

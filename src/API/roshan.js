@@ -1,4 +1,4 @@
-const BASE_URL = "/api/roshan/api";
+const BASE_URL = "/roshan/api";
 const TOKEN = import.meta.env.VITE_API_TOKEN;
 
 // Upload a file to Roshan for transcription
@@ -62,7 +62,9 @@ export const fetchTranscriptStatus = async (id) => {
 export const listAllTranscripts = async () => {
   const res = await fetch(`${BASE_URL}/requests/`, {
     method: "GET",
-    Authorization: `Token ${TOKEN}`,
+    headers: {
+      Authorization: `Token ${TOKEN}`,
+    },
   });
 
   if (!res.ok) {
@@ -77,7 +79,9 @@ export const listAllTranscripts = async () => {
 export const deleteTranscript = async (id) => {
   const res = await fetch(`${BASE_URL}/requests/${id}/`, {
     method: "DELETE",
-    Authorization: `Token ${TOKEN}`,
+    headers: {
+      Authorization: `Token ${TOKEN}`,
+    },
   });
 
   if (!res.ok) {

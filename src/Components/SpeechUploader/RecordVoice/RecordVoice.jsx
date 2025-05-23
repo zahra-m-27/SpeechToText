@@ -3,11 +3,15 @@ import MicIcon from "../../../Assets/images/micIconWhite.png";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
 import styles from "./RecordVoice.module.css";
 import { transcribeFileAPI } from "../../../API/roshan";
+import { useDispatch } from "react-redux";
+import { addToArchive } from "../../../Redux/archiveSlice";
 
 export default function RecordVoice() {
   const [status, setStatus] = useState("idle"); // idle | recording | uploading | uploaded | error
-  const [audioUrl, setAudioUrl] = useState(null);
   const [error, setError] = useState("");
+  const [transcript, setTranscript] = useState(null);
+
+  const dispatch = useDispatch();
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -36,7 +40,23 @@ export default function RecordVoice() {
         try {
           const data = await transcribeFileAPI(file);
           console.log("Roshan API Response:", data[0]);
-          setAudioUrl(URL.createObjectURL(file));
+          const newItem = {
+            name: file.name || data[0].mediaUrl.split("/").pop()?.split("?")[0],
+            date: new Date().toLocaleDateString("fa-IR"),
+            type: "." + data[0].media_url?.split(".").pop() || "",
+            duration: data[0].duration.replace("0:", ""),
+            uploadType: "voice",
+            url: data[0].media_url,
+            segments: data[0].segments,
+            stats: data[0].stats,
+          };
+          dispatch(addToArchive(newItem));
+
+          setTranscript({
+            audioUrl: data[0].media_url,
+            segments: data[0].segments,
+            stats: data[0].stats,
+          });
           setStatus("uploaded");
         } catch (err) {
           console.error("Upload failed:", err);
@@ -66,12 +86,13 @@ export default function RecordVoice() {
     );
   }
 
-  if (status === "uploaded" && audioUrl) {
+  if (status === "uploaded" && transcript) {
     return (
       <ShowAudioDetails
-        audioUrl={audioUrl}
+        audioUrl={transcript.audioUrl}
+        segments={transcript.segments}
         onRestart={() => {
-          setAudioUrl(null);
+          setTranscript(null);
           setStatus("idle");
           setError("");
         }}
