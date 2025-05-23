@@ -50,6 +50,26 @@ export default function ShowAudioDetails({
     return h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`;
   }
 
+  const handleCopy = () => {
+    const fullText = segments.map((s) => s.text).join(" ");
+    navigator.clipboard.writeText(fullText);
+  };
+
+  const handleDownloadAudio = () => {
+    if (!audioUrl) return;
+
+    const link = document.createElement("a");
+    link.href = audioUrl;
+
+    //try to get filename from URL
+    const fileName = audioUrl.split("/").pop()?.split("?")[0] || "audio";
+
+    link.download = decodeURIComponent(fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => {
     const activeEl = segmentRefs.current[activeIndex];
     if (activeEl && activeEl.scrollIntoView) {
@@ -80,8 +100,12 @@ export default function ShowAudioDetails({
           <div className={styles.underline}></div>
         </span>
         <div className={styles.left} style={iconsStyle}>
-          <img src={DownloadIcon} className={styles.download} />
-          <img src={CopyIcon} className={styles.copy} />
+          <img
+            src={DownloadIcon}
+            className={styles.download}
+            onClick={handleDownloadAudio}
+          />
+          <img src={CopyIcon} className={styles.copy} onClick={handleCopy} />
           <button onClick={onRestart}>
             <img src={RestartIcon} className={styles.restart} />
             شروع دوباره
