@@ -3,12 +3,16 @@ import UploadIcon from "../../../Assets/images/uploadIconWhite.png";
 import styles from "./UploadFile.module.css";
 import ShowAudioDetails from "../../ShowAudioDetails/ShowAudioDetails";
 import { transcribeFileAPI } from "../../../API/roshan";
+import { addToArchive } from "../../../Redux/archiveSlice";
+import { useDispatch } from "react-redux";
 
 export default function UploadFile() {
   const fileInputRef = useRef(null);
   const [status, setStatus] = useState("idle"); // "idle" | "uploading" | "uploaded" | "error"
-  const [audioUrl, setAudioUrl] = useState(null);
   const [error, setError] = useState("");
+  const [transcript, setTranscript] = useState(null);
+
+  const dispatch = useDispatch();
 
   const handleButtonClick = () => {
     fileInputRef.current.click();
@@ -24,9 +28,24 @@ export default function UploadFile() {
     try {
       const data = await transcribeFileAPI(file);
       console.log("Roshan API Response:", data);
+      setTranscript({
+        audioUrl: data[0].media_url,
+        segments: data[0].segments,
+        stats: data[0].stats,
+      });
 
-      // Use local URL for playback
-      setAudioUrl(URL.createObjectURL(file));
+      const newItem = {
+        name: file.name || data[0].mediaUrl.split("/").pop()?.split("?")[0],
+        date: new Date().toLocaleDateString("fa-IR"),
+        type: "." + data[0].media_url?.split(".").pop() || "",
+        duration: data[0].duration.replace("0:", ""),
+        uploadType: "upload",
+        url: data[0].media_url,
+        segments: data[0].segments,
+        stats: data[0].stats,
+      };
+      dispatch(addToArchive(newItem));
+
       setStatus("uploaded");
     } catch (err) {
       console.error("Error:", err);
@@ -44,13 +63,14 @@ export default function UploadFile() {
     );
   }
 
-  if (status === "uploaded" && audioUrl) {
+  if (status === "uploaded" && transcript) {
     return (
       <ShowAudioDetails
-        audioUrl={audioUrl}
+        audioUrl={transcript.audioUrl}
+        segments={transcript.segments}
         onRestart={() => {
-          setAudioUrl(null);
           setStatus("idle");
+          setTranscript(null);
         }}
       />
     );
